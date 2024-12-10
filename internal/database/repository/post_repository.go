@@ -30,7 +30,17 @@ func GetAllPosts(db *sql.DB) ([]models.Post, error) {
 func GetPostById(db *sql.DB, id uint64) (*models.Post, error) {
 	post := new(models.Post)
 	row := db.QueryRow("SELECT * FROM posts WHERE id = $1", id)
-	err := row.Scan(&post.Id)
+	err := row.Scan(&post.Id, &post.Name)
+	if err != nil {
+		return nil, err
+	}
+	return post, nil
+}
+
+func GetPostByName(db *sql.DB, name string) (*models.Post, error) {
+	post := new(models.Post)
+	row := db.QueryRow("SELECT * FROM posts WHERE name = $1", name)
+	err := row.Scan(&post.Id, &post.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +48,7 @@ func GetPostById(db *sql.DB, id uint64) (*models.Post, error) {
 }
 
 func CreatePost(db *sql.DB, post *models.Post) (*models.Post, error) {
-	row := db.QueryRow("INSERT INTO posts VALUES ($1) RETURNING id", post.Name)
+	row := db.QueryRow("INSERT INTO posts (name) VALUES ($1) RETURNING id", post.Name)
 	err := row.Scan(&post.Id)
 	if err != nil {
 		return nil, err

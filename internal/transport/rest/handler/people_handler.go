@@ -10,12 +10,12 @@ import (
 )
 
 func GetPeople(c fiber.Ctx) error {
-	cropTypes, err := repository.GetAllCropTypes(database.DB)
+	people, err := repository.GetAllPeople(database.DB)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	return c.JSON(cropTypes)
+	return c.JSON(people)
 }
 
 func DeletePeople(c fiber.Ctx) error {

@@ -178,36 +178,59 @@ func initDb(db *sql.DB) error {
 		return err
 	}
 
-	isExists, err := repository.ExistsPostByName(db, "Администратор предприятия")
+	var adminPostId uint64
+
+	isExists, err := repository.ExistsPostByName(db, config.AdminRole)
 	if err != nil {
 		return err
 	}
 	if !isExists {
-		repository.CreatePost(db, &models.Post{Name: "Администратор предериятия"})
+		post, err := repository.CreatePost(db, &models.Post{Name: config.AdminRole})
+		if err != nil {
+			return err
+		}
+
+		adminPostId = post.Id
+	} else {
+		adminPost, err := repository.GetPostByName(db, config.AdminRole)
+		if err != nil {
+			return err
+		}
+
+		adminPostId = adminPost.Id
 	}
 
-	isExists, err = repository.ExistsPostByName(db, "Сотрудник отдела кадров")
+	isExists, err = repository.ExistsPostByName(db, config.HrRole)
 	if err != nil {
 		return err
 	}
 	if !isExists {
-		repository.CreatePost(db, &models.Post{Name: "Сотрудник отдела кадров"})
+		_, err = repository.CreatePost(db, &models.Post{Name: config.HrRole})
+		if err != nil {
+			return err
+		}
 	}
 
-	isExists, err = repository.ExistsPostByName(db, "Механизатор")
+	isExists, err = repository.ExistsPostByName(db, config.DriverRole)
 	if err != nil {
 		return err
 	}
 	if !isExists {
-		repository.CreatePost(db, &models.Post{Name: "Механизатор"})
+		_, err = repository.CreatePost(db, &models.Post{Name: config.DriverRole})
+		if err != nil {
+			return err
+		}
 	}
+
+	var adminId uint64
 
 	isExists, err = repository.ExistsPeopleByLogin(db, config.AdminLogin)
 	if err != nil {
 		return err
 	}
 	if !isExists {
-		admin := models.People{
+		admin := new(models.People)
+		admin = &models.People{
 			LastName:     config.AdminLastname,
 			FirstName:    config.AdminFirstname,
 			MiddleName:   config.AdminMiddlename,
@@ -215,7 +238,35 @@ func initDb(db *sql.DB) error {
 			Login:        config.AdminLogin,
 			PasswordHash: helpers.EncodeSha256(config.AdminPassword, config.DbSecretKey),
 		}
-		repository.CreatePeople(db, &admin)
+		admin, err = repository.CreatePeople(db, admin)
+		if err != nil {
+			return err
+		}
+		adminId = admin.Id
+	} else {
+		admin, err := repository.GetPeopleByLogin(db, config.AdminLogin)
+		if err != nil {
+			return err
+		}
+		adminId = admin.Id
+	}
+
+	isExists, err = repository.ExistsEmployee(db, adminId, adminPostId)
+	if err != nil {
+		return err
+	}
+	if !isExists {
+		employee := new(models.Employee)
+		employee = &models.Employee{
+			PeopleId:       adminId,
+			PostId:         adminPostId,
+			EmploymentDate: config.AdminEmploymentDate,
+			Salary:         config.AdminSalary,
+		}
+		_, err = repository.CreateEmployee(db, employee)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

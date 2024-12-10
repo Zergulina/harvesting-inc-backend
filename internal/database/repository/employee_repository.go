@@ -49,7 +49,7 @@ func GetAllEmployeesByPeopleId(db *sql.DB, peopleId uint64) ([]models.Employee, 
 }
 
 func CreateEmployee(db *sql.DB, employee *models.Employee) (*models.Employee, error) {
-	_, err := db.Exec("INSERT INTO employees VALUES ($1, $2, $3, $4, $5)", &employee.PeopleId, &employee.PostId, &employee.EmploymentDate, &employee.FireDate, &employee.Salary)
+	_, err := db.Exec("INSERT INTO employees (people_id, post_id, employment_date, fire_date, salary) VALUES ($1, $2, $3, $4, $5)", &employee.PeopleId, &employee.PostId, &employee.EmploymentDate, &employee.FireDate, &employee.Salary)
 	if err != nil {
 		return nil, err
 	}
@@ -79,4 +79,14 @@ func UpdateEmployee(db *sql.DB, employee *models.Employee) (*models.Employee, er
 	}
 
 	return employee, nil
+}
+
+func ExistsEmployee(db *sql.DB, peopleId uint64, postId uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM employees WHERE people_id = $1 AND post_id = $2))", peopleId, postId)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

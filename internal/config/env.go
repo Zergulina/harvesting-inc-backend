@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -18,6 +19,7 @@ var AdminLogin string
 var AdminPassword string
 var AdminBirthdate time.Time
 var AdminEmploymentDate time.Time
+var AdminSalary uint64
 
 func InitEnv() {
 	if err := godotenv.Load(); err != nil {
@@ -67,7 +69,7 @@ func InitEnv() {
 	if !exists {
 		panic(".env var ADMIN_BIRTHDATE does not exist")
 	}
-	adminBirthdate, err := time.Parse("20060102", adminBirthdateStr)
+	adminBirthdate, err := time.Parse("2006-01-02", adminBirthdateStr)
 	if err != nil {
 		panic(err)
 	}
@@ -76,9 +78,18 @@ func InitEnv() {
 	if !exists {
 		panic(".env var ADMIN_EMPLOYMENT_DATE does not exist")
 	}
-	adminEmploymentDate, err := time.Parse("20060102", adminEmploymentDateStr)
+	adminEmploymentDate, err := time.Parse("2006-01-02", adminEmploymentDateStr)
 	if err != nil {
 		panic(err)
 	}
 	AdminEmploymentDate = adminEmploymentDate
+	adminSalaryStr, exists := os.LookupEnv("ADMIN_SALARY")
+	if !exists {
+		panic(".env var ADMIN_SALARY does not exist")
+	}
+	adminSalary, err := strconv.ParseUint(adminSalaryStr, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	AdminSalary = adminSalary
 }

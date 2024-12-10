@@ -5,7 +5,6 @@ import (
 	"backend/internal/database"
 	"backend/internal/transport/rest"
 
-	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -18,9 +17,9 @@ func Run() {
 
 	app := fiber.New()
 
-	app.Use(jwtware.New(jwtware.Config{
-		SigningKey: jwtware.SigningKey{Key: []byte(config.JwtSecretKey)},
-	}))
+	// app.Use(jwtware.New(jwtware.Config{
+	// 	SigningKey: jwtware.SigningKey{Key: []byte(config.JwtSecretKey)},
+	// }))
 
 	rest.RegisterRoutes(app)
 

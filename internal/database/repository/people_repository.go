@@ -48,7 +48,7 @@ func GetAllPeople(db *sql.DB) ([]models.People, error) {
 }
 
 func CreatePeople(db *sql.DB, people *models.People) (*models.People, error) {
-	row := db.QueryRow("INSERT INTO people VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", people.LastName, people.FirstName, people.MiddleName, people.BirthDate, people.Login, people.PasswordHash)
+	row := db.QueryRow("INSERT INTO people (lastname, firstname, middlename, birthdate, login, password_hash) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", people.LastName, people.FirstName, people.MiddleName, people.BirthDate, people.Login, people.PasswordHash)
 	err := row.Scan(&people.Id)
 	if err != nil {
 		return nil, err
