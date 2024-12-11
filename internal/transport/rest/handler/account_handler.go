@@ -4,26 +4,29 @@ import (
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/database/repository"
+	"backend/internal/dto"
 	"backend/internal/helpers"
-	"backend/internal/models"
+	"backend/internal/mappers"
+	"time"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func Register(c fiber.Ctx) error {
-	people := new(models.People)
-	if err := c.Bind().Body(people); err != nil {
+func Register(c *fiber.Ctx) error {
+	registerRequestDto := new(dto.RegisterRequestDto)
+	if err := c.BodyParser(registerRequestDto); err != nil {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
-	isExist, err := repository.ExistsPeopleByLogin(database.DB, people.Login)
+	isExist, err := repository.ExistsPeopleByLogin(database.DB, registerRequestDto.Login)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 	if !isExist {
 		return c.Status(404).SendString("Не найдено")
 	}
-	people.PasswordHash = helpers.EncodeSha256(people.PasswordHash, config.DbSecretKey)
+
+	people := mappers.FromRegisterDtoToPeople(registerRequestDto)
 
 	people, err = repository.CreatePeople(database.DB, people)
 	if err != nil {
@@ -33,12 +36,12 @@ func Register(c fiber.Ctx) error {
 	return c.JSON(people)
 }
 
-func Login(c fiber.Ctx) error {
-	people := new(models.People)
-	if err := c.Bind().Body(people); err != nil {
+func Login(c *fiber.Ctx) error {
+	login := new(dto.LoginRequestDto)
+	if err := c.BodyParser(login); err != nil {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
-	isExist, err := repository.ExistsPeopleByLogin(database.DB, people.Login)
+	isExist, err := repository.ExistsPeopleByLogin(database.DB, login.Login)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -46,21 +49,21 @@ func Login(c fiber.Ctx) error {
 		return c.Status(403).SendString("Неверный логин или пароль")
 	}
 
-	existingPeople, err := repository.GetPeopleByLogin(database.DB, people.Login)
+	existingPeople, err := repository.GetPeopleByLogin(database.DB, login.Login)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	if existingPeople.PasswordHash != helpers.EncodeSha256(people.Login, config.DbSecretKey) {
+	if existingPeople.PasswordHash != helpers.EncodeSha256(login.Login, config.DbSecretKey) {
 		return c.Status(403).SendString("Неверный логин или пароль")
 	}
 
-	employees, err := repository.GetAllEmployeesByPeopleId(database.DB, people.Id)
+	employees, err := repository.GetAllEmployeesByPeopleId(database.DB, existingPeople.Id)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	postsClaim := "|"
+	postsClaim := ""
 	for _, employee := range employees {
 		post, err := repository.GetPostById(database.DB, employee.PostId)
 		if err != nil {
@@ -69,9 +72,12 @@ func Login(c fiber.Ctx) error {
 		postsClaim += post.Name + "|"
 	}
 
+	postsClaim = postsClaim[:len(postsClaim)-1]
+
 	claims := jwt.MapClaims{
 		"login": existingPeople.Login,
 		"posts": postsClaim,
+		"exp":   time.Now().Add(time.Hour * 72).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

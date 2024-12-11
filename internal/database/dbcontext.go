@@ -69,9 +69,10 @@ func initDb(db *sql.DB) error {
 		
 		CREATE TABLE IF NOT EXISTS customers (
 			id SERIAL NOT NULL PRIMARY KEY,
-			ogrn TEXT NOT NULL,
-			name CHAR(13) NOT NULL,
+			ogrn CHAR(13) NOT NULL,
+			name TEXT NOT NULL,
 			logo BYTEA
+			logo_extension TEXT
 		);
 
 		CREATE TABLE IF NOT EXISTS crop_types (
@@ -90,7 +91,7 @@ func initDb(db *sql.DB) error {
 			id SERIAL NOT NULL PRIMARY KEY,
 			coords TEXT NOT NULL,
 			customer_id INTEGER NOT NULL REFERENCES customers(id),
-			crop_iв INTEGER NOT NULL REFERENCES crops(id)
+			crop_id INTEGER NOT NULL REFERENCES crops(id)
 		);
 
 		CREATE TABLE IF NOT EXISTS statuses (

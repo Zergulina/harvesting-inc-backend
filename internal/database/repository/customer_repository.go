@@ -28,7 +28,7 @@ func GetAllCustomers(db *sql.DB) ([]models.Customer, error) {
 }
 
 func CreateCustomer(db *sql.DB, customer *models.Customer) (*models.Customer, error) {
-	row := db.QueryRow("INSERT INTO customers VALUES ($1, $2, $3) RETURNING id", customer.Ogrn, customer.Name, customer.Logo)
+	row := db.QueryRow("INSERT INTO customers (ogrn, name, logo, logo_extension) VALUES ($1, $2, $3, $4) RETURNING id", customer.Ogrn, customer.Name, customer.Logo, customer.LogoExtension)
 	err := row.Scan(&customer.Id)
 	if err != nil {
 		return nil, err
@@ -44,9 +44,9 @@ func DeleteCustomer(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateCustomer(db *sql.DB, customer *models.Customer) (*models.Customer, error) {
+func PatchCustomer(db *sql.DB, id uint64, customer *models.Customer) (*models.Customer, error) {
 
-	result, err := db.Exec("UPDATE posts SET ogrn = $1, name = $2, logo = $3 WHERE id = $4", customer.Ogrn, customer.Name, customer.Logo, customer.Id)
+	result, err := db.Exec("UPDATE posts SET ogrn = $1, name = $2 WHERE id = $3", customer.Ogrn, customer.Name, id)
 	if err != nil {
 		return nil, err
 	}
@@ -59,4 +59,31 @@ func UpdateCustomer(db *sql.DB, customer *models.Customer) (*models.Customer, er
 	}
 
 	return customer, nil
+}
+
+func UpdateCustomer(db *sql.DB, id uint64, customer *models.Customer) (*models.Customer, error) {
+
+	result, err := db.Exec("UPDATE posts SET ogrn = $1, name = $2, logo = $3, logo_extension = $4 WHERE id = $5", customer.Ogrn, customer.Name, customer.Logo, customer.LogoExtension, id)
+	if err != nil {
+		return nil, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if rowsAffected == 0 {
+		return nil, errors.New("")
+	}
+
+	return customer, nil
+}
+
+func ExistsCustomer(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM customers WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

@@ -48,7 +48,7 @@ func GetAllCropsByCropTypeId(db *sql.DB, cropTypeId uint64) ([]models.Crop, erro
 }
 
 func CreateCrop(db *sql.DB, crop *models.Crop) (*models.Crop, error) {
-	row := db.QueryRow("INSERT INTO crops VALUES ($1, $2, $3) RETURNING id", crop.Name, crop.CropTypeId, crop.Description)
+	row := db.QueryRow("INSERT INTO crops (name, crop_type_id, description) VALUES ($1, $2, $3) RETURNING id", crop.Name, crop.CropTypeId, crop.Description)
 	err := row.Scan(&crop.Id)
 	if err != nil {
 		return nil, err
@@ -64,9 +64,9 @@ func DeleteCrop(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateCrop(db *sql.DB, crop *models.Crop) (*models.Crop, error) {
+func UpdateCrop(db *sql.DB, id uint64, crop *models.Crop) (*models.Crop, error) {
 
-	result, err := db.Exec("UPDATE crops SET name = $1, description = $2 WHERE id = $3", crop.Name, crop.Description, crop.Id)
+	result, err := db.Exec("UPDATE crops SET name = $1, description = $2 WHERE id = $3", crop.Name, crop.Description, id)
 	if err != nil {
 		return nil, err
 	}

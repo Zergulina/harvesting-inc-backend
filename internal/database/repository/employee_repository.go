@@ -48,6 +48,27 @@ func GetAllEmployeesByPeopleId(db *sql.DB, peopleId uint64) ([]models.Employee, 
 	return employees, nil
 }
 
+func GetAllEmployeesByPostId(db *sql.DB, postId uint64) ([]models.Employee, error) {
+	rows, err := db.Query("SELECT * FROM employees WHERE post_id = $1", postId)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	employees := []models.Employee{}
+
+	for rows.Next() {
+		e := models.Employee{}
+		err := rows.Scan(&e.PeopleId, &e.PostId, &e.EmploymentDate, &e.FireDate, &e.Salary)
+		if err != nil {
+			continue
+		}
+		employees = append(employees, e)
+	}
+
+	return employees, nil
+}
+
 func CreateEmployee(db *sql.DB, employee *models.Employee) (*models.Employee, error) {
 	_, err := db.Exec("INSERT INTO employees (people_id, post_id, employment_date, fire_date, salary) VALUES ($1, $2, $3, $4, $5)", &employee.PeopleId, &employee.PostId, &employee.EmploymentDate, &employee.FireDate, &employee.Salary)
 	if err != nil {
@@ -64,7 +85,7 @@ func DeleteEmployee(db *sql.DB, peopleId uint64, postId uint64) error {
 	return nil
 }
 
-func UpdateEmployee(db *sql.DB, employee *models.Employee) (*models.Employee, error) {
+func UpdateEmployee(db *sql.DB, peopleId uint64, postId uint64, employee *models.Employee) (*models.Employee, error) {
 
 	result, err := db.Exec("UPDATE employees SET employment_date = $1, fire_date = $2, salary = $3 WHERE people_id = $4 AND post_id = $5", employee.EmploymentDate, employee.FireDate, employee.Salary, employee.PeopleId, employee.PostId)
 	if err != nil {

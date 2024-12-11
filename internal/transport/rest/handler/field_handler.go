@@ -10,36 +10,36 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetCrops(c *fiber.Ctx) error {
-	cropTypeId, err := strconv.ParseUint(c.Params("cropTypeId"), 10, 64)
+func GetFields(c *fiber.Ctx) error {
+	customerId, err := strconv.ParseUint(c.Params("customerId"), 10, 64)
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err := repository.ExistsCropType(database.DB, cropTypeId)
+	isExist, err := repository.ExistsCustomer(database.DB, customerId)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 	if !isExist {
 		return c.Status(404).SendString("Не найдено")
 	}
-	crops, err := repository.GetAllCropsByCropTypeId(database.DB, cropTypeId)
+	crops, err := repository.GetAllFieldsByCustomerId(database.DB, customerId)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
-	cropsResponse := make([]dto.CropDto, 0, len(crops))
+	cropsResponse := make([]dto.FieldDto, 0, len(crops))
 	for _, c := range crops {
-		cropsResponse = append(cropsResponse, *mappers.FromCropToDto(&c))
+		cropsResponse = append(cropsResponse, *mappers.FromFieldToDto(&c))
 	}
 
 	return c.JSON(cropsResponse)
 }
 
-func CreateCrop(c *fiber.Ctx) error {
-	cropTypeId, err := strconv.ParseUint(c.Params("cropTypeId"), 10, 64)
+func CreateField(c *fiber.Ctx) error {
+	customerId, err := strconv.ParseUint(c.Params("customerId"), 10, 64)
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err := repository.ExistsCropType(database.DB, cropTypeId)
+	isExist, err := repository.ExistsCustomer(database.DB, customerId)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -47,25 +47,25 @@ func CreateCrop(c *fiber.Ctx) error {
 		return c.Status(404).SendString("Не найдено")
 	}
 
-	cropDto := new(dto.CreateCropRequestDto)
-	if err := c.BodyParser(cropDto); err != nil {
+	fieldDto := new(dto.CreateFieldRequestDto)
+	if err := c.BodyParser(fieldDto); err != nil {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
 
-	crop, err := repository.CreateCrop(database.DB, mappers.FromCreateRequestDtoToCrop(cropDto, cropTypeId))
+	field, err := repository.CreateField(database.DB, mappers.FromCreateRequestToField(fieldDto, customerId))
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	return c.JSON(mappers.FromCropToDto(crop))
+	return c.JSON(mappers.FromFieldToDto(field))
 }
 
-func DeleteCrop(c *fiber.Ctx) error {
-	cropTypeId, err := strconv.ParseUint(c.Params("cropTypeId"), 10, 64)
+func DeleteField(c *fiber.Ctx) error {
+	customerId, err := strconv.ParseUint(c.Params("customerId"), 10, 64)
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err := repository.ExistsCropType(database.DB, cropTypeId)
+	isExist, err := repository.ExistsCustomer(database.DB, customerId)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -77,7 +77,7 @@ func DeleteCrop(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err = repository.ExistsCrop(database.DB, id)
+	isExist, err = repository.ExistsField(database.DB, id)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -85,19 +85,19 @@ func DeleteCrop(c *fiber.Ctx) error {
 		return c.Status(404).SendString("Не найдено")
 	}
 
-	err = repository.DeleteCrop(database.DB, id)
+	err = repository.DeleteField(database.DB, id)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка обновления")
 	}
 	return c.SendString("Успешно удалено")
 }
 
-func UpdateCrop(c *fiber.Ctx) error {
-	cropTypeId, err := strconv.ParseUint(c.Params("cropTypeId"), 10, 64)
+func UpdateField(c *fiber.Ctx) error {
+	customerId, err := strconv.ParseUint(c.Params("customerId"), 10, 64)
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err := repository.ExistsCropType(database.DB, cropTypeId)
+	isExist, err := repository.ExistsCustomer(database.DB, customerId)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -109,7 +109,7 @@ func UpdateCrop(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err = repository.ExistsCropType(database.DB, id)
+	isExist, err = repository.ExistsField(database.DB, id)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -117,14 +117,14 @@ func UpdateCrop(c *fiber.Ctx) error {
 		return c.Status(404).SendString("Не найдено")
 	}
 
-	cropDto := new(dto.UpdateCropRequestDto)
-	if err := c.BodyParser(cropDto); err != nil {
+	fieldDto := new(dto.UpdateFieldRequestDto)
+	if err := c.BodyParser(fieldDto); err != nil {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
-	crop, err := repository.UpdateCrop(database.DB, id, mappers.FromUpdateRequestDtoToCrop(cropDto))
+	field, err := repository.UpdateField(database.DB, id, mappers.FromUpdateRequestToField(fieldDto, customerId))
 	if err != nil {
 		return c.Status(500).SendString("Ошибка обновления")
 	}
 
-	return c.JSON(mappers.FromCropToDto(crop))
+	return c.JSON(mappers.FromFieldToDto(field))
 }

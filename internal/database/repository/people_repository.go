@@ -37,7 +37,7 @@ func GetAllPeople(db *sql.DB) ([]models.People, error) {
 
 	for rows.Next() {
 		p := models.People{}
-		err := rows.Scan(&p.Id, &p.LastName, &p.FirstName, &p.MiddleName, &p.BirthDate)
+		err := rows.Scan(&p.Id, &p.LastName, &p.FirstName, &p.MiddleName, &p.BirthDate, &p.Login, &p.PasswordHash)
 		if err != nil {
 			continue
 		}
@@ -64,9 +64,9 @@ func DeletePeople(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdatePeople(db *sql.DB, people *models.People) (*models.People, error) {
+func UpdatePeople(db *sql.DB, id uint64, people *models.People) (*models.People, error) {
 
-	result, err := db.Exec("UPDATE people SET lastname = $1, firstname = $2, middlename = $3, birthdate = $4 WHERE id = $5", people.LastName, people.FirstName, people.MiddleName, people.BirthDate, people.Login)
+	result, err := db.Exec("UPDATE people SET lastname = $1, firstname = $2, middlename = $3, birthdate = $4 WHERE id = $5", people.LastName, people.FirstName, people.MiddleName, people.BirthDate, id)
 	if err != nil {
 		return nil, err
 	}

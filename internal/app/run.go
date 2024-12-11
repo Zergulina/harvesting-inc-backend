@@ -5,7 +5,8 @@ import (
 	"backend/internal/database"
 	"backend/internal/transport/rest"
 
-	"github.com/gofiber/fiber/v3"
+	jwtware "github.com/gofiber/contrib/jwt"
+	"github.com/gofiber/fiber/v2"
 )
 
 func Run() {
@@ -17,11 +18,13 @@ func Run() {
 
 	app := fiber.New()
 
-	// app.Use(jwtware.New(jwtware.Config{
-	// 	SigningKey: jwtware.SigningKey{Key: []byte(config.JwtSecretKey)},
-	// }))
-
 	rest.RegisterRoutes(app)
+
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(config.JwtSecretKey)},
+	}))
+
+	rest.RegisterProtectedRoutes(app)
 
 	app.Listen(":3000")
 }

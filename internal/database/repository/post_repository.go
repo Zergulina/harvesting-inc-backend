@@ -89,3 +89,13 @@ func ExistsPostByName(db *sql.DB, name string) (bool, error) {
 	}
 	return isExist, nil
 }
+
+func ExistsPost(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM posts WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
+}

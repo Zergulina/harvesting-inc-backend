@@ -3,7 +3,7 @@ package routes
 import (
 	"backend/internal/transport/rest/handler"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 )
 
 func RegisterCropTypeRoutes(app *fiber.App) {

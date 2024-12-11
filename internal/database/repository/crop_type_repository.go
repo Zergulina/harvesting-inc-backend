@@ -43,8 +43,8 @@ func DeleteCropType(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateCropType(db *sql.DB, post *models.CropType) (*models.CropType, error) {
-	result, err := db.Exec("UPDATE crop_types SET name = $1 WHERE id = $2", post.Name, post.Id)
+func UpdateCropType(db *sql.DB, id uint64, post *models.CropType) (*models.CropType, error) {
+	result, err := db.Exec("UPDATE crop_types SET name = $1 WHERE id = $2", post.Name, id)
 	if err != nil {
 		return nil, err
 	}

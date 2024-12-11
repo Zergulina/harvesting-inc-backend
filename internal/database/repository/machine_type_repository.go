@@ -28,7 +28,7 @@ func GetAllMachineTypes(db *sql.DB) ([]models.MachineType, error) {
 }
 
 func CreateMachineType(db *sql.DB, machineType *models.MachineType) (*models.MachineType, error) {
-	_, err := db.Exec("INSERT INTO machine_types VALUES ($1) RETURNING id", machineType.Name)
+	_, err := db.Exec("INSERT INTO machine_types (name) VALUES ($1) RETURNING id", machineType.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +43,9 @@ func DeleteMachineType(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateMachineType(db *sql.DB, machineType *models.MachineType) (*models.MachineType, error) {
+func UpdateMachineType(db *sql.DB, id uint64, machineType *models.MachineType) (*models.MachineType, error) {
 
-	result, err := db.Exec("UPDATE machine_types SET name = $1 WHERE id = $2", machineType.Name, machineType.Id)
+	result, err := db.Exec("UPDATE machine_types SET name = $1 WHERE id = $2", machineType.Name, id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,4 +58,14 @@ func UpdateMachineType(db *sql.DB, machineType *models.MachineType) (*models.Mac
 	}
 
 	return machineType, nil
+}
+
+func ExistsMachineType(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM machine_types WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

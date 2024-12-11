@@ -10,39 +10,39 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetCropTypes(c *fiber.Ctx) error {
-	cropTypes, err := repository.GetAllCropTypes(database.DB)
+func GetMachineTypes(c *fiber.Ctx) error {
+	machineTypes, err := repository.GetAllMachineTypes(database.DB)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	cropTypesResponse := make([]dto.CropTypeDto, 0, len(cropTypes))
-	for _, c := range cropTypes {
-		cropTypesResponse = append(cropTypesResponse, *mappers.FromCropTypeToDto(&c))
+	machineTypesResponse := make([]dto.MachineTypeDto, 0, len(machineTypes))
+	for _, m := range machineTypes {
+		machineTypesResponse = append(machineTypesResponse, *mappers.FromMachineTypeToDto(&m))
 	}
 
-	return c.JSON(cropTypesResponse)
+	return c.JSON(machineTypesResponse)
 }
 
-func CreateCropType(c *fiber.Ctx) error {
-	cropTypeDto := new(dto.CreateCropTypeRequestDto)
-	if err := c.BodyParser(cropTypeDto); err != nil {
+func CreateMachineType(c *fiber.Ctx) error {
+	machineTypeDto := new(dto.CreateMachineTypeRequestDto)
+	if err := c.BodyParser(machineTypeDto); err != nil {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
-	cropType, err := repository.CreateCropType(database.DB, mappers.FromCreateRequestDtoToCropType(cropTypeDto))
+	machineType, err := repository.CreateMachineType(database.DB, mappers.FromCreateRequestDtoToMachineType(machineTypeDto))
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	return c.JSON(mappers.FromCropTypeToDto(cropType))
+	return c.JSON(mappers.FromMachineTypeToDto(machineType))
 }
 
-func DeleteCropType(c *fiber.Ctx) error {
+func DeleteMachineType(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err := repository.ExistsCropType(database.DB, id)
+	isExist, err := repository.ExistsMachineType(database.DB, id)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
@@ -56,25 +56,25 @@ func DeleteCropType(c *fiber.Ctx) error {
 	return c.SendString("Успешно удалено")
 }
 
-func UpdateCropType(c *fiber.Ctx) error {
+func UpdateMachineType(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(400).SendString("Неверный запрос")
 	}
-	isExist, err := repository.ExistsCropType(database.DB, id)
+	isExist, err := repository.ExistsMachineType(database.DB, id)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 	if !isExist {
 		return c.Status(404).SendString("Не найдено")
 	}
-	cropTypeDto := new(dto.UpdateCropTypeRequestDto)
-	if err := c.BodyParser(cropTypeDto); err != nil {
+	machineTypeDto := new(dto.UpdateMachineTypeRequestDto)
+	if err := c.BodyParser(machineTypeDto); err != nil {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
-	cropType, err := repository.UpdateCropType(database.DB, id, mappers.FromUpdateReqeustDtoToCropType(cropTypeDto))
+	machineType, err := repository.UpdateMachineType(database.DB, id, mappers.FromUpdateRequestDtoToMachineType(machineTypeDto))
 	if err != nil {
 		return c.Status(500).SendString("Ошибка обновления")
 	}
-	return c.JSON(mappers.FromCropTypeToDto(cropType))
+	return c.JSON(mappers.FromMachineTypeToDto(machineType))
 }
