@@ -65,9 +65,9 @@ func DeleteWorkTrip(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateWorkTrip(db *sql.DB, worktrip *models.WorkTrip) (*models.WorkTrip, error) {
+func UpdateWorkTrip(db *sql.DB, id uint64, worktrip *models.WorkTrip) (*models.WorkTrip, error) {
 
-	result, err := db.Exec("UPDATE work_trips SET start_date_time = $1, end_date_time = $2, crop_amount = $3, machine_inv_number = $4, machine_model_id = $5, equipment_inv_number = $6, equipment_model_id = $7 WHERE id = $8", worktrip.StartDateTime, worktrip.EndDateTime, worktrip.CropAmount, worktrip.MachineInvNumber, worktrip.MachineModelId, worktrip.EquipmentInvNumber, worktrip.MachineModelId, worktrip.Id)
+	result, err := db.Exec("UPDATE work_trips SET start_date_time = $1, end_date_time = $2, crop_amount = $3, machine_inv_number = $4, machine_model_id = $5, equipment_inv_number = $6, equipment_model_id = $7 WHERE id = $8", worktrip.StartDateTime, worktrip.EndDateTime, worktrip.CropAmount, worktrip.MachineInvNumber, worktrip.MachineModelId, worktrip.EquipmentInvNumber, worktrip.MachineModelId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -80,4 +80,14 @@ func UpdateWorkTrip(db *sql.DB, worktrip *models.WorkTrip) (*models.WorkTrip, er
 	}
 
 	return worktrip, nil
+}
+
+func ExistsWorkTrip(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM work_trips WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

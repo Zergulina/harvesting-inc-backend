@@ -27,8 +27,8 @@ func GetAllWorks(db *sql.DB) ([]models.Work, error) {
 	return works, nil
 }
 
-func GetAllWorksByFieldId(db *sql.DB, field_id uint64) ([]models.Work, error) {
-	rows, err := db.Query("SELECT * FROM works WHERE field_id = $1", field_id)
+func GetAllWorksByCustomerId(db *sql.DB, customer_id uint64) ([]models.Work, error) {
+	rows, err := db.Query("SELECT works.id, works.start_date, works.end_date, works.field_id FROM works LEFT JOIN fields ON works.field_id = fields.id WHERE fields.customer_id = $1", customer_id)
 	if err != nil {
 		return nil, err
 	}
@@ -65,9 +65,9 @@ func DeleteWork(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateWork(db *sql.DB, work *models.Work) (*models.Work, error) {
+func UpdateWork(db *sql.DB, id uint64, work *models.Work) (*models.Work, error) {
 
-	result, err := db.Exec("UPDATE statuses SET start_date = $1, end_date = $2 WHERE id = $3", work.StartDate, work.EndDate, work.Id)
+	result, err := db.Exec("UPDATE statuses SET start_date = $1, end_date = $2 WHERE id = $3", work.StartDate, work.EndDate, id)
 	if err != nil {
 		return nil, err
 	}
@@ -80,4 +80,14 @@ func UpdateWork(db *sql.DB, work *models.Work) (*models.Work, error) {
 	}
 
 	return work, nil
+}
+
+func ExistsWork(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM works WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }
