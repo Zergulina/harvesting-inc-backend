@@ -28,7 +28,7 @@ func GetAllEquipmentTypes(db *sql.DB) ([]models.EquipmentType, error) {
 }
 
 func CreateEquipmentType(db *sql.DB, equipmentType *models.EquipmentType) (*models.EquipmentType, error) {
-	_, err := db.Exec("INSERT INTO equipment_types VALUES ($1) RETURNING id", equipmentType.Name)
+	_, err := db.Exec("INSERT INTO equipment_types (name) VALUES ($1) RETURNING id", equipmentType.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +43,9 @@ func DeleteEquipmentType(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateEquipmentType(db *sql.DB, equipmentType *models.EquipmentType) (*models.EquipmentType, error) {
+func UpdateEquipmentType(db *sql.DB, id uint64, equipmentType *models.EquipmentType) (*models.EquipmentType, error) {
 
-	result, err := db.Exec("UPDATE equipment_types SET name = $1 WHERE id = $2", equipmentType.Name, equipmentType.Id)
+	result, err := db.Exec("UPDATE equipment_types SET name = $1 WHERE id = $2", equipmentType.Name, id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,4 +58,14 @@ func UpdateEquipmentType(db *sql.DB, equipmentType *models.EquipmentType) (*mode
 	}
 
 	return equipmentType, nil
+}
+
+func ExistsEquipmentType(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM equipment_types WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

@@ -22,6 +22,7 @@ func GetFields(c *fiber.Ctx) error {
 	if !isExist {
 		return c.Status(404).SendString("Не найдено")
 	}
+
 	crops, err := repository.GetAllFieldsByCustomerId(database.DB, customerId)
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")

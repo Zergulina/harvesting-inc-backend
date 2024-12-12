@@ -1,9 +1,8 @@
 package dto
 
 type CreateFieldRequestDto struct {
-	Coords     string `json:"coords"`
-	CustomerId uint64 `json:"customer_id"`
-	CropId     uint64 `json:"crop_id"`
+	Coords string `json:"coords"`
+	CropId uint64 `json:"crop_id"`
 }
 
 type FieldDto struct {
@@ -14,7 +13,6 @@ type FieldDto struct {
 }
 
 type UpdateFieldRequestDto struct {
-	Coords     string `json:"coords"`
-	CustomerId uint64 `json:"customer_id"`
-	CropId     uint64 `json:"crop_id"`
+	Coords string `json:"coords"`
+	CropId uint64 `json:"crop_id"`
 }

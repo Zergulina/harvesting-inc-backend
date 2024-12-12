@@ -49,7 +49,7 @@ func GetAllWorkTripsByWorkId(db *sql.DB, work_id uint64) ([]models.WorkTrip, err
 }
 
 func CreateWorkTrip(db *sql.DB, workTrip *models.WorkTrip) (*models.WorkTrip, error) {
-	row := db.QueryRow("INSERT INTO work_trips VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id", workTrip.StartDateTime, workTrip.EndDateTime, workTrip.CropAmount, workTrip.MachineInvNumber, workTrip.MachineModelId, workTrip.EquipmentInvNumber, workTrip.EquipmentModelId)
+	row := db.QueryRow("INSERT INTO work_trips (start_date_time, end_date_time, crop_amount, work_id, machine_inv_number, machine_model_id, equipment_inv_number, equipment_model_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id", workTrip.StartDateTime, workTrip.EndDateTime, workTrip.CropAmount, workTrip.MachineInvNumber, workTrip.MachineModelId, workTrip.EquipmentInvNumber, workTrip.EquipmentModelId)
 	err := row.Scan(&workTrip.Id)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func DeleteWorkTrip(db *sql.DB, id uint64) error {
 
 func UpdateWorkTrip(db *sql.DB, worktrip *models.WorkTrip) (*models.WorkTrip, error) {
 
-	result, err := db.Exec("UPDATE work_trips SET start_date_time = $1, end_date_time = $2, crop_amount = $3, work_id = $4, machine_inv_number = $5, machine_model_id = $6, equipment_inv_number = $7, equipment_model_id = $8 WHERE id = $9", worktrip.StartDateTime, worktrip.EndDateTime, worktrip.CropAmount, worktrip.WorkId, worktrip.MachineInvNumber, worktrip.MachineModelId, worktrip.EquipmentInvNumber, worktrip.MachineModelId, worktrip.Id)
+	result, err := db.Exec("UPDATE work_trips SET start_date_time = $1, end_date_time = $2, crop_amount = $3, machine_inv_number = $4, machine_model_id = $5, equipment_inv_number = $6, equipment_model_id = $7 WHERE id = $8", worktrip.StartDateTime, worktrip.EndDateTime, worktrip.CropAmount, worktrip.MachineInvNumber, worktrip.MachineModelId, worktrip.EquipmentInvNumber, worktrip.MachineModelId, worktrip.Id)
 	if err != nil {
 		return nil, err
 	}

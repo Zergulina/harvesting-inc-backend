@@ -49,7 +49,7 @@ func GetAllVacationsByPeopleId(db *sql.DB, peopleId uint64) ([]models.Vacation, 
 }
 
 func CreateVacation(db *sql.DB, vacation *models.Vacation) (*models.Vacation, error) {
-	_, err := db.Exec("INSERT INTO vacations VALUES ($1, $2, $3) RETURNING id", vacation.PeopleId, vacation.StartDate, vacation.EndDate)
+	_, err := db.Exec("INSERT INTO vacations (people_id, start_date) VALUES ($1, $2, $3) RETURNING id", vacation.PeopleId, vacation.StartDate, vacation.EndDate)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func GetAllStatuses(db *sql.DB) ([]models.Status, error) {
 }
 
 func CreateStatus(db *sql.DB, status *models.Status) (*models.Status, error) {
-	row := db.QueryRow("INSERT INTO statuses VALUES ($1, $2) RETURNING id", status.Name, status.IsAvailable)
+	row := db.QueryRow("INSERT INTO statuses (name, is_available) VALUES ($1, $2) RETURNING id", status.Name, status.IsAvailable)
 	err := row.Scan(&status.Id)
 	if err != nil {
 		return nil, err

@@ -49,7 +49,7 @@ func GetAllWorksByFieldId(db *sql.DB, field_id uint64) ([]models.Work, error) {
 }
 
 func CreateWork(db *sql.DB, work *models.Work) (*models.Work, error) {
-	row := db.QueryRow("INSERT INTO works VALUES ($1, $2, $3) RETURNING id", work.StartDate, work.EndDate, work.FieldId)
+	row := db.QueryRow("INSERT INTO works (start_date, end_date, field_id) VALUES ($1, $2, $3) RETURNING id", work.StartDate, work.EndDate, work.FieldId)
 	err := row.Scan(&work.Id)
 	if err != nil {
 		return nil, err

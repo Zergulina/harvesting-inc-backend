@@ -79,7 +79,7 @@ func CreateMachine(db *sql.DB, machine *models.Machine) (*models.Machine, error)
 		inv_number++
 	}
 
-	_, err = db.Exec("INSERT INTO machines VALUES ($1, $2, $3, $4, $5)", &machine.InvNumber, &machine.MachineModelId, &machine.StatusId, &machine.BuyDate, &machine.DrawDownDate)
+	_, err = db.Exec("INSERT INTO machines (inv_number, machine_model_id, status_id, buy_date) VALUES ($1, $2, $3, $4)", &machine.InvNumber, &machine.MachineModelId, &machine.StatusId, &machine.BuyDate)
 	if err != nil {
 		return nil, err
 	}
@@ -94,9 +94,9 @@ func DeleteMachine(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateMachine(db *sql.DB, machine *models.Machine) (*models.Machine, error) {
+func UpdateMachine(db *sql.DB, machineModelId uint64, invNumber uint64, machine *models.Machine) (*models.Machine, error) {
 
-	result, err := db.Exec("UPDATE machines SET status_id = $1, buy_date = $2, draw_down_date = $3 WHERE inv_number = $4 AND machine_model_id = $5", machine.StatusId, machine.BuyDate, machine.DrawDownDate, machine.InvNumber, machine.MachineModelId)
+	result, err := db.Exec("UPDATE machines SET status_id = $1, buy_date = $2, draw_down_date = $3 WHERE inv_number = $4 AND machine_model_id = $5", machine.StatusId, machine.BuyDate, machine.DrawDownDate, invNumber, machineModelId)
 	if err != nil {
 		return nil, err
 	}
@@ -109,4 +109,14 @@ func UpdateMachine(db *sql.DB, machine *models.Machine) (*models.Machine, error)
 	}
 
 	return machine, nil
+}
+
+func ExistsMachine(db *sql.DB, machineModelId uint64, invNumber uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM machines WHERE machine_model_id = $1 AND inv_number = $2))", machineModelId, invNumber)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

@@ -27,7 +27,7 @@ func GetAllEquipment(db *sql.DB) ([]models.Machine, error) {
 	return machines, nil
 }
 
-func GetAllEquipmentByEquipmentTypeId(db *sql.DB, equipmentTypeId uint64) ([]models.Equipment, error) {
+func GetAllEquipmentsByEquipmentTypeId(db *sql.DB, equipmentTypeId uint64) ([]models.Equipment, error) {
 	rows, err := db.Query("SELECT equipment.inv_number, equipment.machine_model_id, equipment.status_id, equipment.buy_date, equipment.draw_down_date FROM equipment LEFT JOIN equipment_models ON equipment.equipment_model_id = equipment_models.id WHERE equipment_models.equipment_type_id = $1", equipmentTypeId)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func GetAllEquipmentByEquipmentTypeId(db *sql.DB, equipmentTypeId uint64) ([]mod
 	return equipment, nil
 }
 
-func GetAllEquipmentByEquipmentModelId(db *sql.DB, equipmentModelId uint64) ([]models.Equipment, error) {
+func GetAllEquipmentsByEquipmentModelId(db *sql.DB, equipmentModelId uint64) ([]models.Equipment, error) {
 	rows, err := db.Query("SELECT * FROM equipment WHERE equipment_model_id = $1", equipmentModelId)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func CreateEquipment(db *sql.DB, equipment *models.Equipment) (*models.Equipment
 		inv_number++
 	}
 
-	_, err = db.Exec("INSERT INTO equipment VALUES ($1, $2, $3, $4, $5)", &equipment.InvNumber, &equipment.EquipmentModelId, &equipment.StatusId, &equipment.BuyDate, &equipment.DrawDownDate)
+	_, err = db.Exec("INSERT INTO equipment (inv_number, equipment_model_id, status_id, buy_date) VALUES ($1, $2, $3, $4)", &equipment.InvNumber, &equipment.EquipmentModelId, &equipment.StatusId, &equipment.BuyDate)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +94,8 @@ func DeleteEquipment(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateEquipment(db *sql.DB, equipment *models.Equipment) (*models.Equipment, error) {
-	result, err := db.Exec("UPDATE equipment SET status_id = $1, buy_date = $2, draw_down_date = $3 WHERE inv_number = $4 AND equipment_model_id = $5", equipment.StatusId, equipment.BuyDate, equipment.DrawDownDate, equipment.InvNumber, equipment.EquipmentModelId)
+func UpdateEquipment(db *sql.DB, equipmentModelId uint64, invNumber uint64, equipment *models.Equipment) (*models.Equipment, error) {
+	result, err := db.Exec("UPDATE equipment SET status_id = $1, buy_date = $2, draw_down_date = $3 WHERE inv_number = $4 AND equipment_model_id = $5", equipment.StatusId, equipment.BuyDate, equipment.DrawDownDate, invNumber, equipmentModelId)
 	if err != nil {
 		return nil, err
 	}
@@ -108,4 +108,14 @@ func UpdateEquipment(db *sql.DB, equipment *models.Equipment) (*models.Equipment
 	}
 
 	return equipment, nil
+}
+
+func ExistsEquipment(db *sql.DB, equipmentModelId uint64, invNumber uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM equipments WHERE equipment_model_id = $1 AND inv_number = $2))", equipmentModelId, invNumber)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

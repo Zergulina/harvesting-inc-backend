@@ -6,7 +6,7 @@ import (
 )
 
 func CreateMachineEquipmentType(db *sql.DB, machine_type_id uint64, equipment_type_id uint64) error {
-	_, err := db.Exec("INSERT INTO machine_equipment_types VALUES($1, $2)", machine_type_id, equipment_type_id)
+	_, err := db.Exec("INSERT INTO machine_equipment_types (machine_type_id, equipment_type_id) VALUES($1, $2)", machine_type_id, equipment_type_id)
 
 	return err
 }
@@ -57,4 +57,14 @@ func GetAllEquipmentTypesByMachineTypeId(db *sql.DB, machine_type_id uint64) ([]
 	}
 
 	return equipment_types, nil
+}
+
+func ExistsMachineEquipmentType(db *sql.DB, machine_type_id uint64, equipment_type_id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM machine_equipment_types WHERE machine_type_id = $1 AND equipment_type_id = $2))", machine_type_id, equipment_type_id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

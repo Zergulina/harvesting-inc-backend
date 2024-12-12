@@ -49,7 +49,7 @@ func GetAllEquipmentModelsByEquipmentTypeId(db *sql.DB, equipmentTypeId uint64) 
 }
 
 func CreateEquipmentModel(db *sql.DB, equipmentModel *models.EquipmentModel) (*models.EquipmentModel, error) {
-	row := db.QueryRow("INSERT INTO equipment_models VALUES ($1, $2) RETURNING id", equipmentModel.Name, equipmentModel.EquipmentTypeId)
+	row := db.QueryRow("INSERT INTO equipment_models (name, equipment_type_id) VALUES ($1, $2) RETURNING id", equipmentModel.Name, equipmentModel.EquipmentTypeId)
 	err := row.Scan(&equipmentModel.Id)
 	if err != nil {
 		return nil, err
@@ -65,9 +65,9 @@ func DeleteEquipmentModel(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateEquipmentModel(db *sql.DB, equipmentModel *models.EquipmentModel) (*models.EquipmentModel, error) {
+func UpdateEquipmentModel(db *sql.DB, id uint64, equipmentModel *models.EquipmentModel) (*models.EquipmentModel, error) {
 
-	result, err := db.Exec("UPDATE equipment_models SET name = $1 WHERE id = $3", equipmentModel.Name, equipmentModel.Id)
+	result, err := db.Exec("UPDATE equipment_models SET name = $1 WHERE id = $2", equipmentModel.Name, id)
 	if err != nil {
 		return nil, err
 	}
@@ -80,4 +80,14 @@ func UpdateEquipmentModel(db *sql.DB, equipmentModel *models.EquipmentModel) (*m
 	}
 
 	return equipmentModel, nil
+}
+
+func ExistsEquipmentModel(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM equipment_models WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

@@ -49,7 +49,7 @@ func GetAllMachineModelsByMachineTypeId(db *sql.DB, machineTypeId uint64) ([]mod
 }
 
 func CreateMachineModel(db *sql.DB, machineModel *models.MachineModel) (*models.MachineModel, error) {
-	row := db.QueryRow("INSERT INTO machine_models VALUES ($1, $2) RETURNING id", machineModel.Name, machineModel.MachineTypeId)
+	row := db.QueryRow("INSERT INTO machine_models (name, machine_type_id) VALUES ($1, $2) RETURNING id", machineModel.Name, machineModel.MachineTypeId)
 	err := row.Scan(&machineModel.Id)
 	if err != nil {
 		return nil, err
@@ -65,9 +65,9 @@ func DeleteMachineModel(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateMachineModel(db *sql.DB, machineModel *models.MachineModel) (*models.MachineModel, error) {
+func UpdateMachineModel(db *sql.DB, id uint64, machineModel *models.MachineModel) (*models.MachineModel, error) {
 
-	result, err := db.Exec("UPDATE machine_models SET name = $1 WHERE id = $3", machineModel.Name, machineModel.Id)
+	result, err := db.Exec("UPDATE machine_models SET name = $1 WHERE id = $2", machineModel.Name, id)
 	if err != nil {
 		return nil, err
 	}
@@ -80,4 +80,14 @@ func UpdateMachineModel(db *sql.DB, machineModel *models.MachineModel) (*models.
 	}
 
 	return machineModel, nil
+}
+
+func ExistsMachineModel(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM machine_models WHERE id = $1))", id)
+	err := row.Scan(&isExist)
+	if err != nil {
+		return false, err
+	}
+	return isExist, nil
 }

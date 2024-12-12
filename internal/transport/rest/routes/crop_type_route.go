@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterCropRoutes(app *fiber.App) {
+func RegisterCropTypeRoutes(app *fiber.App) {
 	cropType := app.Group("/api/crop-types")
 
 	cropType.Get("", handler.GetCropTypes)
