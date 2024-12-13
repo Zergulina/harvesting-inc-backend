@@ -7,6 +7,7 @@ import (
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func Run() {
@@ -17,6 +18,8 @@ func Run() {
 	}
 
 	app := fiber.New()
+
+	app.Use(cors.New())
 
 	rest.RegisterRoutes(app)
 

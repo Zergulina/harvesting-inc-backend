@@ -3,7 +3,6 @@ package repository
 import (
 	"backend/internal/models"
 	"database/sql"
-	"errors"
 )
 
 func GetAllVacations(db *sql.DB) ([]models.Vacation, error) {
@@ -64,18 +63,12 @@ func DeleteVacation(db *sql.DB, vacation *models.Vacation) error {
 	return nil
 }
 
-func UpdateVacation(db *sql.DB, vacation *models.Vacation) (*models.Vacation, error) {
-	result, err := db.Exec("UPDATE vacations SET end_date = $1 WHERE people_id = $2 AND start_date = $3", vacation.EndDate, vacation.PeopleId, vacation.StartDate)
+func ExistsStatus(db *sql.DB, id uint64) (bool, error) {
+	var isExist bool
+	row := db.QueryRow("SELECT (EXISTS (SELECT FROM statuses WHERE id = $1))", id)
+	err := row.Scan(&isExist)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if rowsAffected == 0 {
-		return nil, errors.New("")
-	}
-
-	return vacation, nil
+	return isExist, nil
 }

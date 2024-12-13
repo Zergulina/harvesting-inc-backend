@@ -9,6 +9,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var DbConnectionString string
+
 var DbSecretKey string
 var JwtSecretKey string
 
@@ -26,6 +28,11 @@ func InitEnv() {
 		panic(err)
 	}
 
+	dbConnectionString, exists := os.LookupEnv("DB_CONNECTION_STRING")
+	if !exists {
+		panic(".env var DB_CONNECTION_STRING does not exist")
+	}
+	DbConnectionString = dbConnectionString
 	dbSecretKey, exists := os.LookupEnv("DB_SECRET_KEY")
 	if !exists {
 		panic(".env var DB_SECRET_KEY does not exist")

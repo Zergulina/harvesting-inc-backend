@@ -7,10 +7,10 @@ import (
 )
 
 func RegisterEquipmentRoutes(app *fiber.App) {
-	equipment := app.Group("/api/equipment-types/:equipmentTypeId/equipment-models/:equipmentModelId/equipments")
+	equipments := app.Group("/api/equipments-types/:equipmentTypeId/equipments-models/:equipmentModelId/equipments")
 
-	equipment.Get("", handler.GetMachines)
-	equipment.Post("", handler.CreateMachine)
-	equipment.Delete(":invNumber", handler.DeleteMachine)
-	equipment.Put(":invNumber", handler.UpdateMachine)
+	equipments.Get("", handler.GetMachines)
+	equipments.Post("", handler.CreateMachine)
+	equipments.Delete(":invNumber", handler.DeleteMachine)
+	equipments.Put(":invNumber", handler.UpdateMachine)
 }

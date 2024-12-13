@@ -7,7 +7,7 @@ import (
 )
 
 func RegisterEquipmentTypeRoutes(app *fiber.App) {
-	equipmentType := app.Group("/api/equipment-types")
+	equipmentType := app.Group("/api/equipments-types")
 
 	equipmentType.Get("", handler.GetMachineTypes)
 	equipmentType.Post("", handler.CreateMachineType)

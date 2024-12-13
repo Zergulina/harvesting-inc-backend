@@ -44,9 +44,9 @@ func DeleteStatus(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdateStatus(db *sql.DB, status *models.Status) (*models.Status, error) {
+func UpdateStatus(db *sql.DB, id uint64, status *models.Status) (*models.Status, error) {
 
-	result, err := db.Exec("UPDATE statuses SET name = $1, is_available = $2 WHERE id = $3", status.Name, status.IsAvailable, status.Id)
+	result, err := db.Exec("UPDATE statuses SET name = $1, is_available = $2 WHERE id = $3", status.Name, status.IsAvailable, id)
 	if err != nil {
 		return nil, err
 	}

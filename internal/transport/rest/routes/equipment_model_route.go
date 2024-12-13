@@ -7,7 +7,7 @@ import (
 )
 
 func RegisterEquipmentModelRoutes(app *fiber.App) {
-	equipmentModel := app.Group("/api/equipment-types/:equipmentTypeId/equipment-models")
+	equipmentModel := app.Group("/api/equipments-types/:equipmentTypeId/equipments-models")
 
 	equipmentModel.Get("", handler.GetMachineModels)
 	equipmentModel.Post("", handler.CreateMachineModel)

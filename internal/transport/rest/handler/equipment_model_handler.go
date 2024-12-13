@@ -52,12 +52,12 @@ func CreateEquipmentModel(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
 
-	equipment, err := repository.CreateEquipmentModel(database.DB, mappers.FromCreateRequestDtoToEquipmentModel(equipmentModelDto, equipmentTypeId))
+	equipments, err := repository.CreateEquipmentModel(database.DB, mappers.FromCreateRequestDtoToEquipmentModel(equipmentModelDto, equipmentTypeId))
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	return c.JSON(mappers.FromEquipmentModelToDto(equipment))
+	return c.JSON(mappers.FromEquipmentModelToDto(equipments))
 }
 
 func DeleteEquipmentModel(c *fiber.Ctx) error {

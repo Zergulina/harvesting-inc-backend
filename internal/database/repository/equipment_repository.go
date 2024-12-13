@@ -28,7 +28,7 @@ func GetAllEquipment(db *sql.DB) ([]models.Machine, error) {
 }
 
 func GetAllEquipmentsByEquipmentTypeId(db *sql.DB, equipmentTypeId uint64) ([]models.Equipment, error) {
-	rows, err := db.Query("SELECT equipment.inv_number, equipment.machine_model_id, equipment.status_id, equipment.buy_date, equipment.draw_down_date FROM equipment LEFT JOIN equipment_models ON equipment.equipment_model_id = equipment_models.id WHERE equipment_models.equipment_type_id = $1", equipmentTypeId)
+	rows, err := db.Query("SELECT equipments.inv_number, equipments.machine_model_id, equipments.status_id, equipments.buy_date, equipments.draw_down_date FROM equipment LEFT JOIN equipment_models ON equipments.equipment_model_id = equipment_models.id WHERE equipment_models.equipment_type_id = $1", equipmentTypeId)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func GetAllEquipmentsByEquipmentTypeId(db *sql.DB, equipmentTypeId uint64) ([]mo
 }
 
 func GetAllEquipmentsByEquipmentModelId(db *sql.DB, equipmentModelId uint64) ([]models.Equipment, error) {
-	rows, err := db.Query("SELECT * FROM equipment WHERE equipment_model_id = $1", equipmentModelId)
+	rows, err := db.Query("SELECT * FROM equipments WHERE equipment_model_id = $1", equipmentModelId)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func GetAllEquipmentsByEquipmentModelId(db *sql.DB, equipmentModelId uint64) ([]
 }
 
 func CreateEquipment(db *sql.DB, equipment *models.Equipment) (*models.Equipment, error) {
-	row := db.QueryRow("SELECT inv_number FROM equipment WHERE equipment_model_id = $1 ORDER BY inv_number DESC LIMIT 1", equipment.InvNumber)
+	row := db.QueryRow("SELECT inv_number FROM equipments WHERE equipment_model_id = $1 ORDER BY inv_number DESC LIMIT 1", equipment.InvNumber)
 	var inv_number uint64
 	err := row.Scan(&inv_number)
 	if err != nil {
@@ -79,7 +79,7 @@ func CreateEquipment(db *sql.DB, equipment *models.Equipment) (*models.Equipment
 		inv_number++
 	}
 
-	_, err = db.Exec("INSERT INTO equipment (inv_number, equipment_model_id, status_id, buy_date) VALUES ($1, $2, $3, $4)", &equipment.InvNumber, &equipment.EquipmentModelId, &equipment.StatusId, &equipment.BuyDate)
+	_, err = db.Exec("INSERT INTO equipments (inv_number, equipment_model_id, status_id, buy_date) VALUES ($1, $2, $3, $4)", &equipment.InvNumber, &equipment.EquipmentModelId, &equipment.StatusId, &equipment.BuyDate)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func CreateEquipment(db *sql.DB, equipment *models.Equipment) (*models.Equipment
 }
 
 func DeleteEquipment(db *sql.DB, id uint64) error {
-	_, err := db.Exec("DELETE FROM equipment WHERE id = $1", id)
+	_, err := db.Exec("DELETE FROM equipments WHERE id = $1", id)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func DeleteEquipment(db *sql.DB, id uint64) error {
 }
 
 func UpdateEquipment(db *sql.DB, equipmentModelId uint64, invNumber uint64, equipment *models.Equipment) (*models.Equipment, error) {
-	result, err := db.Exec("UPDATE equipment SET status_id = $1, buy_date = $2, draw_down_date = $3 WHERE inv_number = $4 AND equipment_model_id = $5", equipment.StatusId, equipment.BuyDate, equipment.DrawDownDate, invNumber, equipmentModelId)
+	result, err := db.Exec("UPDATE equipments SET status_id = $1, buy_date = $2, draw_down_date = $3 WHERE inv_number = $4 AND equipment_model_id = $5", equipment.StatusId, equipment.BuyDate, equipment.DrawDownDate, invNumber, equipmentModelId)
 	if err != nil {
 		return nil, err
 	}

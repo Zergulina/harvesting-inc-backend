@@ -5,33 +5,33 @@ import (
 	"backend/internal/models"
 )
 
-func FromEquipmentToDto(equipment *models.Equipment) *dto.EquipmentDto {
+func FromEquipmentToDto(equipments *models.Equipment) *dto.EquipmentDto {
 	equipmentDto := new(dto.EquipmentDto)
-	equipmentDto.InvNumber = equipment.InvNumber
-	equipmentDto.EquipmentModelId = equipment.EquipmentModelId
-	equipmentDto.StatusId = equipment.EquipmentModelId
-	equipmentDto.BuyDate = equipment.BuyDate
-	if equipment.DrawDownDate.Valid {
-		equipmentDto.DrawDownDate = &equipment.DrawDownDate.Time
+	equipmentDto.InvNumber = equipments.InvNumber
+	equipmentDto.EquipmentModelId = equipments.EquipmentModelId
+	equipmentDto.StatusId = equipments.EquipmentModelId
+	equipmentDto.BuyDate = equipments.BuyDate
+	if equipments.DrawDownDate.Valid {
+		equipmentDto.DrawDownDate = &equipments.DrawDownDate.Time
 	}
 	return equipmentDto
 }
 
 func FromCreateRequestDtoToEquipment(createDto *dto.CreateEquipmentRequestDto, equipmentModelId uint64) *models.Equipment {
-	equipment := new(models.Equipment)
-	equipment.EquipmentModelId = equipmentModelId
-	equipment.StatusId = createDto.StatusId
-	equipment.BuyDate = createDto.BuyDate
-	return equipment
+	equipments := new(models.Equipment)
+	equipments.EquipmentModelId = equipmentModelId
+	equipments.StatusId = createDto.StatusId
+	equipments.BuyDate = createDto.BuyDate
+	return equipments
 }
 
 func FromUpdateRequestDtoToEquipment(updateDto *dto.UpdateEquipmentRequestDto) *models.Equipment {
-	equipment := new(models.Equipment)
-	equipment.StatusId = updateDto.StatusId
-	equipment.BuyDate = updateDto.BuyDate
+	equipments := new(models.Equipment)
+	equipments.StatusId = updateDto.StatusId
+	equipments.BuyDate = updateDto.BuyDate
 	if updateDto.DrawDownDate != nil {
-		equipment.DrawDownDate.Time = *updateDto.DrawDownDate
-		equipment.DrawDownDate.Valid = true
+		equipments.DrawDownDate.Time = *updateDto.DrawDownDate
+		equipments.DrawDownDate.Valid = true
 	}
-	return equipment
+	return equipments
 }
