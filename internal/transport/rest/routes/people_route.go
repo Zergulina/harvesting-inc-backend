@@ -7,9 +7,10 @@ import (
 )
 
 func RegisterPeopleRoutes(app *fiber.App) {
-	crop := app.Group("/api/people")
+	people := app.Group("/api/people")
 
-	crop.Get("", handler.GetPeople)
-	crop.Delete(":id", handler.DeletePeople)
-	crop.Put(":id", handler.UpdatePeople)
+	people.Get("", handler.GetPeople)
+	people.Delete(":id", handler.DeletePeople)
+	people.Put(":id", handler.UpdatePeople)
+	people.Get("me", handler.Me)
 }

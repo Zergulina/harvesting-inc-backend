@@ -7,8 +7,8 @@ import (
 )
 
 func RegisterAccountRoutes(app *fiber.App) {
-	crop := app.Group("/api/account")
+	account := app.Group("/api/account")
 
-	crop.Post("register", handler.Register)
-	crop.Post("login", handler.Login)
+	account.Post("register", handler.Register)
+	account.Post("login", handler.Login)
 }
