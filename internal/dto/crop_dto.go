@@ -6,10 +6,11 @@ type CreateCropRequestDto struct {
 }
 
 type CropDto struct {
-	Id          uint64  `json:"id"`
-	Name        string  `json:"name"`
-	CropTypeId  uint64  `json:"crop_type_id"`
-	Description *string `json:"description"`
+	Id           uint64  `json:"id"`
+	Name         string  `json:"name"`
+	CropTypeId   uint64  `json:"crop_type_id"`
+	CropTypeName string  `json:"crop_type_name"`
+	Description  *string `json:"description"`
 }
 
 type UpdateCropRequestDto struct {

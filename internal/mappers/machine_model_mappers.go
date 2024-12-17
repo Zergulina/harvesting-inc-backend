@@ -5,11 +5,12 @@ import (
 	"backend/internal/models"
 )
 
-func FromMachineModelToDto(machineModel *models.MachineModel) *dto.MachineModelDto {
+func FromMachineModelToDto(machineModel *models.MachineModel, machineType *models.MachineType) *dto.MachineModelDto {
 	machineModelDto := new(dto.MachineModelDto)
 	machineModelDto.Id = machineModel.Id
 	machineModelDto.Name = machineModel.Name
 	machineModelDto.MachineTypeId = machineModel.MachineTypeId
+	machineModelDto.MachineTypeName = machineType.Name
 	return machineModelDto
 }
 

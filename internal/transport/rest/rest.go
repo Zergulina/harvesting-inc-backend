@@ -13,6 +13,7 @@ func RegisterRoutes(app *fiber.App) {
 func RegisterProtectedRoutes(app *fiber.App) {
 	routes.RegisterCropTypeRoutes(app)
 	routes.RegisterCropRoutes(app)
+	routes.RegisterPostRoutes(app)
 	routes.RegisterPeopleRoutes(app)
 	routes.RegisterEmployeeRoutes(app)
 	routes.RegisterCustomerRoutes(app)
@@ -29,4 +30,5 @@ func RegisterProtectedRoutes(app *fiber.App) {
 	routes.RegisterWorkTripRoutes(app)
 	routes.RegisterVacationRoutes(app)
 	routes.RegisterAdminRoutes(app)
+	routes.RegisterReportRoutes(app)
 }

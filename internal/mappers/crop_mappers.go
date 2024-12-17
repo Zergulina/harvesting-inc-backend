@@ -5,11 +5,12 @@ import (
 	"backend/internal/models"
 )
 
-func FromCropToDto(crop *models.Crop) *dto.CropDto {
+func FromCropToDto(crop *models.Crop, cropType *models.CropType) *dto.CropDto {
 	cropDto := new(dto.CropDto)
 	cropDto.Id = crop.Id
 	cropDto.Name = crop.Name
-	cropDto.CropTypeId = crop.CropTypeId
+	cropDto.CropTypeId = cropType.Id
+	cropDto.CropTypeName = cropType.Name
 	if crop.Description.Valid {
 		cropDto.Description = &crop.Description.String
 	}
@@ -22,6 +23,7 @@ func FromCreateRequestDtoToCrop(createRequestDto *dto.CreateCropRequestDto, crop
 	crop.CropTypeId = cropTypeId
 	if createRequestDto.Description != nil {
 		crop.Description.String = *createRequestDto.Description
+		crop.Description.Valid = true
 	}
 	return crop
 }
@@ -31,6 +33,7 @@ func FromUpdateRequestDtoToCrop(updateRequestDto *dto.UpdateCropRequestDto) *mod
 	crop.Name = updateRequestDto.Name
 	if updateRequestDto.Description != nil {
 		crop.Description.String = *updateRequestDto.Description
+		crop.Description.Valid = true
 	}
 	return crop
 }

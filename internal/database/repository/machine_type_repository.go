@@ -27,6 +27,16 @@ func GetAllMachineTypes(db *sql.DB) ([]models.MachineType, error) {
 	return machine_types, nil
 }
 
+func GetMachineTypeById(db *sql.DB, id uint64) (*models.MachineType, error) {
+	machineType := new(models.MachineType)
+	row := db.QueryRow("SELECT * FROM machine_types WHERE id = $1 LIMIT 1", id)
+	err := row.Scan(&machineType.Id, &machineType.Name)
+	if err != nil {
+		return nil, err
+	}
+	return machineType, nil
+}
+
 func CreateMachineType(db *sql.DB, machineType *models.MachineType) (*models.MachineType, error) {
 	_, err := db.Exec("INSERT INTO machine_types (name) VALUES ($1) RETURNING id", machineType.Name)
 	if err != nil {

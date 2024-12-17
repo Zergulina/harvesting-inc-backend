@@ -54,7 +54,7 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	if existingPeople.PasswordHash != helpers.EncodeSha256(login.Login, config.DbSecretKey) {
+	if existingPeople.PasswordHash != helpers.EncodeSha256(login.Password, config.DbSecretKey) {
 		return c.Status(403).SendString("Неверный логин или пароль")
 	}
 

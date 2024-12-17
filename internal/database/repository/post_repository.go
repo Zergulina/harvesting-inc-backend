@@ -64,8 +64,8 @@ func DeletePost(db *sql.DB, id uint64) error {
 	return nil
 }
 
-func UpdatePost(db *sql.DB, post *models.Post) (*models.Post, error) {
-	result, err := db.Exec("UPDATE posts SET name = $1 WHERE id = $2", post.Name, post.Id)
+func UpdatePost(db *sql.DB, id uint64, post *models.Post) (*models.Post, error) {
+	result, err := db.Exec("UPDATE posts SET name = $1 WHERE id = $2", post.Name, id)
 	if err != nil {
 		return nil, err
 	}

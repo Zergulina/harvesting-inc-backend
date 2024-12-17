@@ -26,9 +26,15 @@ func GetCrops(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
+
+	cropType, err := repository.GetCropTypeById(database.DB, cropTypeId)
+	if err != nil {
+		return c.Status(500).SendString("Ошибка базы данных")
+	}
+
 	cropsResponse := make([]dto.CropDto, 0, len(crops))
-	for _, c := range crops {
-		cropsResponse = append(cropsResponse, *mappers.FromCropToDto(&c))
+	for _, crop := range crops {
+		cropsResponse = append(cropsResponse, *mappers.FromCropToDto(&crop, cropType))
 	}
 
 	return c.JSON(cropsResponse)
@@ -57,7 +63,12 @@ func CreateCrop(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
 
-	return c.JSON(mappers.FromCropToDto(crop))
+	cropType, err := repository.GetCropTypeById(database.DB, crop.CropTypeId)
+	if err != nil {
+		return c.Status(500).SendString("Ошибка базы данных")
+	}
+
+	return c.JSON(mappers.FromCropToDto(crop, cropType))
 }
 
 func DeleteCrop(c *fiber.Ctx) error {
@@ -126,5 +137,10 @@ func UpdateCrop(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Ошибка обновления")
 	}
 
-	return c.JSON(mappers.FromCropToDto(crop))
+	cropType, err := repository.GetCropTypeById(database.DB, crop.CropTypeId)
+	if err != nil {
+		return c.Status(500).SendString("Ошибка базы данных")
+	}
+
+	return c.JSON(mappers.FromCropToDto(crop, cropType))
 }

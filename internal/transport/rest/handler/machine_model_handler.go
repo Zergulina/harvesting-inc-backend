@@ -26,9 +26,14 @@ func GetMachineModels(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
+	machineType, err := repository.GetMachineTypeById(database.DB, machineTypeId)
+	if err != nil {
+		return c.Status(500).SendString("Ошибка базы данных")
+	}
+
 	machineModelsResponse := make([]dto.MachineModelDto, 0, len(machineModels))
 	for _, m := range machineModels {
-		machineModelsResponse = append(machineModelsResponse, *mappers.FromMachineModelToDto(&m))
+		machineModelsResponse = append(machineModelsResponse, *mappers.FromMachineModelToDto(&m, machineType))
 	}
 
 	return c.JSON(machineModelsResponse)
@@ -52,12 +57,15 @@ func CreateMachineModel(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Неверный формат запроса")
 	}
 
-	machine, err := repository.CreateMachineModel(database.DB, mappers.FromCreateRequestDtoToMachineModel(machineModelDto, machineTypeId))
+	machineModel, err := repository.CreateMachineModel(database.DB, mappers.FromCreateRequestDtoToMachineModel(machineModelDto, machineTypeId))
 	if err != nil {
 		return c.Status(500).SendString("Ошибка базы данных")
 	}
-
-	return c.JSON(mappers.FromMachineModelToDto(machine))
+	machineType, err := repository.GetMachineTypeById(database.DB, machineTypeId)
+	if err != nil {
+		return c.Status(500).SendString("Ошибка базы данных")
+	}
+	return c.JSON(mappers.FromMachineModelToDto(machineModel, machineType))
 }
 
 func DeleteMachineModel(c *fiber.Ctx) error {
@@ -125,6 +133,9 @@ func UpdateMachineModel(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).SendString("Ошибка обновления")
 	}
-
-	return c.JSON(mappers.FromMachineModelToDto(machineModel))
+	machineType, err := repository.GetMachineTypeById(database.DB, machineTypeId)
+	if err != nil {
+		return c.Status(500).SendString("Ошибка базы данных")
+	}
+	return c.JSON(mappers.FromMachineModelToDto(machineModel, machineType))
 }

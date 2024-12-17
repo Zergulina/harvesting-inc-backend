@@ -17,7 +17,7 @@ func GetFieldHarvestingReport(db *sql.DB, start_period time.Time, end_period tim
 										JOIN crops ON crops.id = fields.crop_id
 										JOIN crop_types ON crop_types.id = crops.crop_type_id)
 							SELECT customer_field.field_id, customer_field.field_coords, customer_field.crop_type_name, harvested_on_field_at_day.day, harvested_on_field_at_day.crop_amount
-								FROM customer_field JOIN harvested_on_field_at_day JOIN ON customer_field.field_id = harvested_on_field_at_day.field_id
+								FROM customer_field JOIN harvested_on_field_at_day ON customer_field.field_id = harvested_on_field_at_day.field_id
 									WHERE harvested_on_field_at_day.day >= $1 AND harvested_on_field_at_day.day <= $2 AND customer_field.customer_id = $3`, start_period, end_period, customer_id)
 	if err != nil {
 		return nil, err

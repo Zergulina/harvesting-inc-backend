@@ -17,7 +17,7 @@ func GetAllCustomers(db *sql.DB) ([]models.Customer, error) {
 
 	for rows.Next() {
 		c := models.Customer{}
-		err := rows.Scan(&c.Id, &c.Ogrn, &c.Name, &c.Logo)
+		err := rows.Scan(&c.Id, &c.Ogrn, &c.Name, &c.Logo, &c.LogoExtension)
 		if err != nil {
 			continue
 		}

@@ -26,6 +26,16 @@ func GetAllCropTypes(db *sql.DB) ([]models.CropType, error) {
 	return crop_types, nil
 }
 
+func GetCropTypeById(db *sql.DB, id uint64) (*models.CropType, error) {
+	cropType := new(models.CropType)
+	row := db.QueryRow("SELECT * FROM crop_types WHERE id = $1 LIMIT 1", id)
+	err := row.Scan(&cropType.Id, &cropType.Name)
+	if err != nil {
+		return nil, err
+	}
+	return cropType, nil
+}
+
 func CreateCropType(db *sql.DB, post *models.CropType) (*models.CropType, error) {
 	row := db.QueryRow("INSERT INTO crop_types (name) VALUES ($1) RETURNING id", post.Name)
 	err := row.Scan(&post.Id)

@@ -51,8 +51,8 @@ func initDb(db *sql.DB) error {
 		);
 
 		CREATE TABLE IF NOT EXISTS employees (
-			people_id INTEGER NOT NULL REFERENCES people(id),
-			post_id INTEGER NOT NULL REFERENCES posts(id),
+			people_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+			post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
 			employment_date DATE NOT NULL,
 			fire_date DATE,
 			salary INTEGER NOT NULL,
@@ -75,15 +75,15 @@ func initDb(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS crops (
 			id SERIAL NOT NULL PRIMARY KEY,
 			name TEXT NOT NULL,
-			crop_type_id INTEGER NOT NULL REFERENCES crop_types(id),
+			crop_type_id INTEGER NOT NULL REFERENCES crop_types(id) ON DELETE CASCADE,
 			description TEXT
 		);
 
 		CREATE TABLE IF NOT EXISTS fields (
 			id SERIAL NOT NULL PRIMARY KEY,
 			coords TEXT NOT NULL,
-			customer_id INTEGER NOT NULL REFERENCES customers(id),
-			crop_id INTEGER NOT NULL REFERENCES crops(id)
+			customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+			crop_id INTEGER NOT NULL REFERENCES crops(id) ON DELETE CASCADE
 		);
 
 		CREATE TABLE IF NOT EXISTS statuses (
@@ -100,13 +100,13 @@ func initDb(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS machine_models (
 			id SERIAL NOT NULL PRIMARY KEY,
 			name TEXT NOT NULL,
-			machine_type_id INTEGER NOT NULL REFERENCES machine_types(id)
+			machine_type_id INTEGER NOT NULL REFERENCES machine_types(id) ON DELETE CASCADE
 		);
 		
 		CREATE TABLE IF NOT EXISTS machines (
 			inv_number INTEGER NOT NULL,
-			machine_model_id INTEGER NOT NULL REFERENCES machine_models(id),
-			status_id INTEGER NOT NULL REFERENCES statuses(id),
+			machine_model_id INTEGER NOT NULL REFERENCES machine_models(id) ON DELETE CASCADE,
+			status_id INTEGER NOT NULL REFERENCES statuses(id) ON DELETE CASCADE,
 			buy_date DATE NOT NULL,
 			draw_down_date DATE,
 			PRIMARY KEY(inv_number, machine_model_id)
@@ -120,21 +120,21 @@ func initDb(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS equipment_models (
 			id SERIAL NOT NULL PRIMARY KEY,
 			name TEXT NOT NULL,
-			equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id)
+			equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id) ON DELETE CASCADE
 		);
 
 		CREATE TABLE IF NOT EXISTS equipments (
 			inv_number INTEGER NOT NULL,
-			equipment_model_id INTEGER NOT NULL REFERENCES equipment_models(id),
-			status_id INTEGER NOT NULL REFERENCES statuses(id),
+			equipment_model_id INTEGER NOT NULL REFERENCES equipment_models(id) ON DELETE CASCADE,
+			status_id INTEGER NOT NULL REFERENCES statuses(id) ON DELETE CASCADE,
 			buy_date DATE NOT NULL,
 			draw_down_date DATE,
 			PRIMARY KEY(inv_number, equipment_model_id)
 		);
 
 		CREATE TABLE IF NOT EXISTS machine_equipment_types (
-			machine_type_id INTEGER NOT NULL REFERENCES machine_types(id),
-			equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id),
+			machine_type_id INTEGER NOT NULL REFERENCES machine_types(id) ON DELETE CASCADE,
+			equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id) ON DELETE CASCADE,
 			PRIMARY KEY(machine_type_id, equipment_type_id)
 		);
 
@@ -142,25 +142,26 @@ func initDb(db *sql.DB) error {
 			id SERIAL NOT NULL PRIMARY KEY,
 			start_date DATE NOT NULL,
 			end_date DATE,
-			field_id INTEGER NOT NULL REFERENCES fields(id)
+			field_id INTEGER NOT NULL REFERENCES fields(id) ON DELETE CASCADE
 		);
 
 		CREATE TABLE IF NOT EXISTS work_trips (
 			id SERIAL NOT NULL PRIMARY KEY,
 			start_date TIMESTAMP NOT NULL,
 			end_date TIMESTAMP,
+			people_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
 			crop_amount INTEGER NOT NULL,
-			work_id INTEGER NOT NULL REFERENCES works(id),
+			work_id INTEGER NOT NULL REFERENCES works(id) ON DELETE CASCADE,
 			machine_inv_number INTEGER NOT NULL,
 			machine_model_id INTEGER NOT NULL,
-			FOREIGN KEY (machine_inv_number, machine_model_id) REFERENCES machines(inv_number, machine_model_id),
+			FOREIGN KEY (machine_inv_number, machine_model_id) REFERENCES machines(inv_number, machine_model_id) ON DELETE CASCADE,
 			equipment_inv_number INTEGER,
 			equipment_model_id INTEGER,
-			FOREIGN KEY (equipment_inv_number, equipment_model_id) REFERENCES equipments(inv_number, equipment_model_id)
+			FOREIGN KEY (equipment_inv_number, equipment_model_id) REFERENCES equipments(inv_number, equipment_model_id) ON DELETE CASCADE
 		);
 
 		CREATE TABLE IF NOT EXISTS vacations (
-			people_id INTEGER NOT NULL REFERENCES people(id),
+			people_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
 			start_date DATE NOT NULL,
 			end_date DATE NOT NULL,
 			PRIMARY KEY(people_id, start_date)
@@ -269,7 +270,7 @@ func ResetDb() {
 	_, err := DB.Exec(`
 			DROP SCHEMA public CASCADE;
 			CREATE SCHEMA public;
-	
+
 			CREATE TABLE IF NOT EXISTS people (
 				id SERIAL NOT NULL PRIMARY KEY,
 				lastname TEXT NOT NULL,
@@ -284,10 +285,10 @@ func ResetDb() {
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT UNIQUE
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS employees (
-				people_id INTEGER NOT NULL REFERENCES people(id),
-				post_id INTEGER NOT NULL REFERENCES posts(id),
+				people_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+				post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
 				employment_date DATE NOT NULL,
 				fire_date DATE,
 				salary INTEGER NOT NULL,
@@ -301,101 +302,102 @@ func ResetDb() {
 				logo BYTEA,
 				logo_extension TEXT
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS crop_types (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS crops (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL,
-				crop_type_id INTEGER NOT NULL REFERENCES crop_types(id),
+				crop_type_id INTEGER NOT NULL REFERENCES crop_types(id) ON DELETE CASCADE,
 				description TEXT
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS fields (
 				id SERIAL NOT NULL PRIMARY KEY,
 				coords TEXT NOT NULL,
-				customer_id INTEGER NOT NULL REFERENCES customers(id),
-				crop_id INTEGER NOT NULL REFERENCES crops(id)
+				customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+				crop_id INTEGER NOT NULL REFERENCES crops(id) ON DELETE CASCADE
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS statuses (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL,
 				is_available BOOLEAN NOT NULL
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS machine_types (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS machine_models (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL,
-				machine_type_id INTEGER NOT NULL REFERENCES machine_types(id)
+				machine_type_id INTEGER NOT NULL REFERENCES machine_types(id) ON DELETE CASCADE
 			);
 			
 			CREATE TABLE IF NOT EXISTS machines (
 				inv_number INTEGER NOT NULL,
-				machine_model_id INTEGER NOT NULL REFERENCES machine_models(id),
-				status_id INTEGER NOT NULL REFERENCES statuses(id),
+				machine_model_id INTEGER NOT NULL REFERENCES machine_models(id) ON DELETE CASCADE,
+				status_id INTEGER NOT NULL REFERENCES statuses(id) ON DELETE CASCADE,
 				buy_date DATE NOT NULL,
 				draw_down_date DATE,
 				PRIMARY KEY(inv_number, machine_model_id)
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS equipment_types (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS equipment_models (
 				id SERIAL NOT NULL PRIMARY KEY,
 				name TEXT NOT NULL,
-				equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id)
+				equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id) ON DELETE CASCADE
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS equipments (
 				inv_number INTEGER NOT NULL,
-				equipment_model_id INTEGER NOT NULL REFERENCES equipment_models(id),
-				status_id INTEGER NOT NULL REFERENCES statuses(id),
+				equipment_model_id INTEGER NOT NULL REFERENCES equipment_models(id) ON DELETE CASCADE,
+				status_id INTEGER NOT NULL REFERENCES statuses(id) ON DELETE CASCADE,
 				buy_date DATE NOT NULL,
 				draw_down_date DATE,
 				PRIMARY KEY(inv_number, equipment_model_id)
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS machine_equipment_types (
-				machine_type_id INTEGER NOT NULL REFERENCES machine_types(id),
-				equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id),
+				machine_type_id INTEGER NOT NULL REFERENCES machine_types(id) ON DELETE CASCADE,
+				equipment_type_id INTEGER NOT NULL REFERENCES equipment_types(id) ON DELETE CASCADE,
 				PRIMARY KEY(machine_type_id, equipment_type_id)
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS works (
 				id SERIAL NOT NULL PRIMARY KEY,
 				start_date DATE NOT NULL,
 				end_date DATE,
-				field_id INTEGER NOT NULL REFERENCES fields(id)
+				field_id INTEGER NOT NULL REFERENCES fields(id) ON DELETE CASCADE
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS work_trips (
 				id SERIAL NOT NULL PRIMARY KEY,
 				start_date TIMESTAMP NOT NULL,
 				end_date TIMESTAMP,
+				people_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
 				crop_amount INTEGER NOT NULL,
-				work_id INTEGER NOT NULL REFERENCES works(id),
+				work_id INTEGER NOT NULL REFERENCES works(id) ON DELETE CASCADE,
 				machine_inv_number INTEGER NOT NULL,
 				machine_model_id INTEGER NOT NULL,
-				FOREIGN KEY (machine_inv_number, machine_model_id) REFERENCES machines(inv_number, machine_model_id),
+				FOREIGN KEY (machine_inv_number, machine_model_id) REFERENCES machines(inv_number, machine_model_id) ON DELETE CASCADE,
 				equipment_inv_number INTEGER,
 				equipment_model_id INTEGER,
-				FOREIGN KEY (equipment_inv_number, equipment_model_id) REFERENCES equipments(inv_number, equipment_model_id)
+				FOREIGN KEY (equipment_inv_number, equipment_model_id) REFERENCES equipments(inv_number, equipment_model_id) ON DELETE CASCADE
 			);
-	
+
 			CREATE TABLE IF NOT EXISTS vacations (
-				people_id INTEGER NOT NULL REFERENCES people(id),
+				people_id INTEGER NOT NULL REFERENCES people(id) ON DELETE CASCADE,
 				start_date DATE NOT NULL,
 				end_date DATE NOT NULL,
 				PRIMARY KEY(people_id, start_date)
@@ -408,11 +410,21 @@ func ResetDb() {
 			INSERT INTO people (lastname, firstname, middlename, birthdate, login, password_hash)
 				VALUES 
 				($1, $2, $3, $4, $5, $6),
-				('Иванов', 'Иван', 'Иванович', '1990-01-01', 'ivanov.ii', '12345678'),
-				('Петров', 'Пётр', 'Петрович', '1985-06-15', 'petrov.pp', '12345678'),
-				('Сидоров', 'Сидор', 'Сидорович', '1992-02-20', 'sidorov.ss', '12345678'),
-				('Табуретка', 'Нампай', 'Сервлетович', '2001-02-01', 'kocherga.va', '12345678');
-			`, config.AdminLastname, config.AdminFirstname, config.AdminMiddlename, config.AdminBirthdate, config.AdminLogin, helpers.EncodeSha256(config.AdminPassword, config.DbSecretKey))
+				('Иванов', 'Иван', 'Иванович', '1990-01-01', 'ivanov.ii', $7),
+				('Петров', 'Пётр', 'Петрович', '1985-06-15', 'petrov.pp', $8),
+				('Сидоров', 'Сидор', 'Сидорович', '1992-02-20', 'sidorov.ss', $9),
+				('Табуретка', 'Нампай', 'Сервлетович', '2001-02-01', 'kocherga.va', $10);
+			`,
+		config.AdminLastname,
+		config.AdminFirstname,
+		config.AdminMiddlename,
+		config.AdminBirthdate,
+		config.AdminLogin,
+		helpers.EncodeSha256(config.AdminPassword, config.DbSecretKey),
+		helpers.EncodeSha256("12345678", config.DbSecretKey),
+		helpers.EncodeSha256("12345678", config.DbSecretKey),
+		helpers.EncodeSha256("12345678", config.DbSecretKey),
+		helpers.EncodeSha256("12345678", config.DbSecretKey))
 	if err != nil {
 		panic(err)
 	}
@@ -500,7 +512,7 @@ func ResetDb() {
 			INSERT INTO fields (coords, customer_id, crop_id)
 				VALUES 
 				('52.1234, 45.5678', 1, 1),
-				('54.9012, 43.1111', 1, 2),
+				('54.9012, 43.1111', 1, 12),
 				('53.4567, 42.7890', 2, 3),
 				('52.1234, 45.5678', 2, 4),
 				('54.9054, 43.1111', 3, 5),
@@ -630,8 +642,8 @@ func ResetDb() {
 	_, err = DB.Exec(`
 			INSERT INTO works (start_date, end_date, field_id)
 				VALUES 
-				('2024-06-01', '2024-07-12', 1),
-				('2024-07-15', NULL, 2),
+				('2024-06-01', NULL, 1),
+				('2024-06-02', NULL, 2),
 				('2024-07-20', NULL, 3),			
 				('2024-07-21', NULL, 4),
 				('2024-07-21', NULL, 5);
@@ -640,11 +652,20 @@ func ResetDb() {
 		panic(err)
 	}
 	_, err = DB.Exec(`
-			INSERT INTO work_trips (start_date, end_date, crop_amount, work_id, machine_inv_number, machine_model_id, equipment_inv_number, equipment_model_id)
+			INSERT INTO work_trips (start_date, end_date, people_id, crop_amount, work_id, machine_inv_number, machine_model_id, equipment_inv_number, equipment_model_id)
 				VALUES 
-				('2021-01-01', '2020-12-31', 0, 1, 1, 1, NULL, NULL),
-				('2021-06-15', NULL, 0, 1, 2, 1, NULL, NULL),
-				('2021-06-15', NULL, 0, 1, 1, 4, NULL, NULL);
+				('2024-06-02', '2024-06-02', 4, 4, 1, 1, 1, NULL, NULL),
+				('2024-06-02', '2024-06-02', 5, 4, 1, 2, 1, NULL, NULL),
+				('2024-06-03', '2024-06-03', 4, 3, 1, 1, 1, NULL, NULL),
+				('2024-06-03', '2024-06-03', 5, 2, 1, 2, 1, NULL, NULL),
+				('2024-06-05', '2024-06-05', 4, 5, 1, 1, 1, NULL, NULL),
+				('2024-06-05', '2024-06-05', 5, 1, 1, 2, 1, NULL, NULL),
+				('2024-06-02', '2024-06-03', 4, 4, 2, 1, 1, NULL, NULL),
+				('2024-06-02', '2024-06-03', 5, 1, 2, 2, 1, NULL, NULL),
+				('2024-06-03', '2024-06-04', 4, 3, 2, 1, 1, NULL, NULL),
+				('2024-06-03', '2024-06-04', 5, 2, 2, 2, 1, NULL, NULL),
+				('2024-06-04', '2024-06-04', 5, 2, 2, 1, 1, NULL, NULL),
+				('2024-06-04', '2024-06-04', 4, 1, 2, 2, 1, NULL, NULL)
 				`)
 	if err != nil {
 		panic(err)

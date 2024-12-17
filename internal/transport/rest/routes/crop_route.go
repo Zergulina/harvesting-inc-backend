@@ -9,8 +9,8 @@ import (
 func RegisterCropRoutes(app *fiber.App) {
 	crop := app.Group("/api/crop-types/:cropTypeId/crops")
 
-	crop.Get("", handler.GetCropTypes)
-	crop.Post("", handler.CreateCropType)
-	crop.Delete(":id", handler.DeleteCropType)
-	crop.Put(":id", handler.UpdateCropType)
+	crop.Get("", handler.GetCrops)
+	crop.Post("", handler.CreateCrop)
+	crop.Delete(":id", handler.DeleteCrop)
+	crop.Put(":id", handler.UpdateCrop)
 }
